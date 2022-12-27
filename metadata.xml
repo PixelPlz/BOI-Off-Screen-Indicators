@@ -4,8 +4,8 @@
     <directory>off-screen indicators</directory>
     <id>2907117024</id>
     <description></description>
-    <version>1.1</version>
-    <visibility>Private</visibility>
+    <version>1.2</version>
+    <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Items"/>
     <tag id="Familiars"/>

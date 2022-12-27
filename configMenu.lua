@@ -9,6 +9,7 @@ OIconfig = {
 
 	bossIndicators = true,
 	bossBarsCompat = true,
+
 	ludoIndicators = true,
 }
 

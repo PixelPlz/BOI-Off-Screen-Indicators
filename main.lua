@@ -21,18 +21,22 @@ OffscreenIndicators:addOIblacklist(type, variant, subtype, *condition, *value)
 
 
 Adding extra indicator:
-OffscreenIndicators:addExtraIndicator(name, type, variant, subtype, icon)
-	icon should be the FULL path to the icon
-	name is used for finding a specifc entry so it can be accessed later
+OffscreenIndicators:addExtraIndicator(name, type, variant, subtype, *icon, *bigIcon, *directional)
+	'icon' should be the FULL path to the icon (will use the default white arrow if not specified)
+	'bigIcon' determines if the icon should use a 32x32 sprite or a 64x64 one
+	'directional' determines if the icon should point towards its entity (facing right is 0 degrees)
+	'name' is used for finding a specifc entry so it can be accessed later
 		for example:
-		adding an indicator with OffscreenIndicators:addExtraIndicator("test", EntityType.ENTITY_GAPER, -1, -1, "gfx/ui/offscreen_icons/default.png")
+		adding an indicator with OffscreenIndicators:addExtraIndicator("test", EntityType.ENTITY_GAPER, -1, -1, "gfx/ui/offscreen_icons/default.png", false, true)
 		would let you access all the values from this entry with OIextraIndicators.test.{variable name}
-		the available variables are:
+		in this case the available variables are:
 			type = EntityType.ENTITY_GAPER
 			variant = -1
 			subtype = -1
 			icon = "gfx/ui/offscreen_icons/default.png"
-			enabled = true (lets you toggle indicators with Mod Config Menu for example, true by default)
+			bigIcon = false
+			directional = true
+			enabled = true (true by default, lets you toggle an indicator with Mod Config Menu for example)
 --/////////////////////////////////////////]]--
 
 
@@ -52,6 +56,7 @@ OIblacklist = {
 	{EntityType.ENTITY_MEGA_SATAN, 1, -1}, {EntityType.ENTITY_MEGA_SATAN, 2, -1}, -- Mega Satan's hands
 	{EntityType.ENTITY_ULTRA_DOOR, -1, -1},
 	{EntityType.ENTITY_STAIN, 0, -1, "state", NpcState.STATE_MOVE}, -- Underground state
+	{EntityType.ENTITY_ULTRA_GREED, -1, -1, "state", {9000, 9001}}, -- Dead states
 	{EntityType.ENTITY_BIG_HORN, 0, -1, "state", NpcState.STATE_MOVE}, -- Hidden state
 	{EntityType.ENTITY_BIG_HORN, 1, -1}, {EntityType.ENTITY_BIG_HORN, 2, -1}, -- Big Horn holes
 	{EntityType.ENTITY_GIDEON, -1, -1},
@@ -106,15 +111,7 @@ end
 
 -- Add blacklist entry
 function mod:addOIblacklist(type, variant, subtype, condition, value)
-	local tableValues = {type, variant, subtype}
-	if condition then
-		table.insert(tableValues, condition)
-		if value then
-			table.insert(tableValues, value)
-		end
-	end
-
-	table.insert(OIblacklist, tableValues)
+	table.insert(OIblacklist, {type, variant, subtype, condition, value})
 end
 
 
@@ -125,17 +122,17 @@ end
 
 OIextraIndicators = {
 	-- Familiars
-	roboBaby2 = {type = EntityType.ENTITY_FAMILIAR, variant = FamiliarVariant.ROBO_BABY_2, 			 subtype = -1, icon = path .. "robobaby2.png", enabled = true},
-	bbFly 	  = {type = EntityType.ENTITY_FAMILIAR, variant = FamiliarVariant.BLUEBABYS_ONLY_FRIEND, subtype = -1, icon = path .. "bbfly.png", 	   enabled = true},
-	lilDumpy  = {type = EntityType.ENTITY_FAMILIAR, variant = FamiliarVariant.LIL_DUMPY, 			 subtype = -1, icon = path .. "dumpy.png", 	   enabled = true},
-	stitches  = {type = EntityType.ENTITY_FAMILIAR, variant = FamiliarVariant.STITCHES, 			 subtype = -1, icon = path .. "stitches.png",  enabled = true},
+	roboBaby2 = {type = EntityType.ENTITY_FAMILIAR, variant = FamiliarVariant.ROBO_BABY_2, 			 subtype = -1, icon = path .. "robobaby2.png", bigIcon = false, directional = false, enabled = true},
+	bbFly 	  = {type = EntityType.ENTITY_FAMILIAR, variant = FamiliarVariant.BLUEBABYS_ONLY_FRIEND, subtype = -1, icon = path .. "bbfly.png", 	   bigIcon = false, directional = false, enabled = true},
+	lilDumpy  = {type = EntityType.ENTITY_FAMILIAR, variant = FamiliarVariant.LIL_DUMPY, 			 subtype = -1, icon = path .. "dumpy.png", 	   bigIcon = false, directional = false, enabled = true},
+	stitches  = {type = EntityType.ENTITY_FAMILIAR, variant = FamiliarVariant.STITCHES, 			 subtype = -1, icon = path .. "stitches.png",  bigIcon = false, directional = false, enabled = true},
 
 	-- Pickups
-	goldenCoin = {type = EntityType.ENTITY_PICKUP, variant = PickupVariant.PICKUP_COIN, subtype = CoinSubType.COIN_GOLDEN, icon = path .. "coin.png", enabled = true},
+	goldenCoin = {type = EntityType.ENTITY_PICKUP, variant = PickupVariant.PICKUP_COIN, subtype = CoinSubType.COIN_GOLDEN, icon = path .. "coin.png", bigIcon = false, directional = false, enabled = true},
 
 	-- Effects
-	deathsList = {type = EntityType.ENTITY_EFFECT, variant = EffectVariant.DEATH_SKULL, subtype = -1, icon = path .. "skull.png", 	  enabled = true},
-	purgatory  = {type = EntityType.ENTITY_EFFECT, variant = EffectVariant.PURGATORY, 	subtype = 0,  icon = path .. "purgatory.png", enabled = true},
+	deathsList = {type = EntityType.ENTITY_EFFECT, variant = EffectVariant.DEATH_SKULL, subtype = -1, icon = path .. "skull.png", 	  bigIcon = false, directional = false, enabled = true},
+	purgatory  = {type = EntityType.ENTITY_EFFECT, variant = EffectVariant.PURGATORY, 	subtype = 0,  icon = path .. "purgatory.png", bigIcon = false, directional = false, enabled = true},
 }
 
 -- Check if the entity is in the list or not
@@ -149,8 +146,8 @@ function mod:hasIndicator(entity)
 end
 
 -- Add extra indicator
-function mod:addExtraIndicator(name, addType, addVariant, addSubType, addIcon)
-	OIextraIndicators[name] = {type = addType, variant = addVariant, subtype = addSubType, icon = addIcon, enabled = true}
+function mod:addExtraIndicator(name, addType, addVariant, addSubType, addIcon, isBigIcon, isDirectional)
+	OIextraIndicators[name] = {type = addType, variant = addVariant, subtype = addSubType, icon = addIcon, bigIcon = isBigIcon, directional = isDirectional, enabled = true}
 end
 
 
@@ -163,21 +160,15 @@ end
 include("configMenu")
 
 -- Render an indicator
-function mod:renderIndicator(position, icon, scale, rotation, newAnm2, newAnimation)
+function mod:renderIndicator(position, icon, scale, rotation, isBig)
 	local sprite = Sprite()
 
-	-- Animation file
-	if newAnm2 then
-		sprite:Load(newAnm2, true)
-		if newAnimation then
-			sprite:Play(newAnimation, true)
-		else
-			sprite:Play(sprite:GetDefaultAnimation())
-		end
-
+	-- Animation
+	sprite:Load("gfx/ui/offscreen_icons/icon.anm2", true)
+	if isBig == true then
+		sprite:Play("Big", true)
 	else
-		sprite:Load("gfx/ui/offscreen_icons/icon.anm2", true)
-		sprite:Play("Idle", true)
+		sprite:Play("Default", true)
 	end
 
 	-- Icon spritesheet
@@ -222,7 +213,7 @@ function mod:isValidBoss(entity)
 	if OIconfig.bossIndicators
 	and entity:ToNPC() and entity:IsBoss()
 	and entity.Visible == true
-	and entity.HitPoints >= 1
+	and entity.HitPoints >= 0.1
 	and mod:onBlacklist(entity) == false
 	and entity:HasEntityFlags(EntityFlag.FLAG_FRIENDLY) == false then
 		return true
@@ -234,7 +225,7 @@ end
 function mod:isLudoWeapon(entity)
 	if OIconfig.ludoIndicators
 	and ((entity:ToTear() and entity:ToTear():HasTearFlags(TearFlags.TEAR_LUDOVICO))
-	or (entity:ToKnife() and entity:ToTear():HasTearFlags(TearFlags.TEAR_LUDOVICO))
+	or (entity:ToKnife() and entity:ToKnife():HasTearFlags(TearFlags.TEAR_LUDOVICO))
 	or (entity:ToLaser() and entity.SubType == LaserSubType.LASER_SUBTYPE_RING_LUDOVICO)) then
 		return true
 	end
@@ -303,16 +294,20 @@ function mod:onRender()
 
 				-- Icon
 				local icon = path .. "default.png"
-				local newAnm2 = nil
-				local newAnimation = nil
+				local isBig = false
 				local rotation = nil
 
 				-- Bosses
 				if entity:ToNPC() and entity:ToNPC():IsBoss() then
 					-- Enhanced boss bars compatibility
 					if HPBars and OIconfig.bossBarsCompat == true then
+						-- Mother's Shadow doesn't have its own icon
+						if entity.Type == EntityType.ENTITY_MOTHERS_SHADOW then
+							icon = path .. "mothers_shadow.png"
+							isBig = true
+
 						-- Dogma's first phase doesn't have a proper bossbar data entry
-						if entity.Type == EntityType.ENTITY_DOGMA and entity.Variant == 0 then
+						elseif entity.Type == EntityType.ENTITY_DOGMA and entity.Variant == 0 then
 							icon = "gfx/ui/bosshp_icons/final/dogma.png"
 
 						else
@@ -324,18 +319,22 @@ function mod:onRender()
 							-- Big icons
 							if ((entity.Type == EntityType.ENTITY_MEGA_SATAN or entity.Type == EntityType.ENTITY_MEGA_SATAN_2) and entity.Variant == 0) or (entity.Type == EntityType.ENTITY_DOGMA and entity.Variant == 2)
 							or (entity.Type == EntityType.ENTITY_BEAST and (entity.Variant == 10 or entity.Variant == 20 or entity.Variant == 30 or entity.Variant == 40)) then
-								newAnm2 = "gfx/ui/bosshp_icons/bosshp_icon_64px.anm2"
-								newAnimation = "idle"
+								isBig = true
 							end
 						end
 
 					else
-						icon = "gfx/ui/offscreen_icons/boss.png"
+						icon = path .. "boss.png"
 					end
 
 				-- Extra indicators
 				elseif extraIndicator ~= false then
-					icon = extraIndicator.icon
+					if extraIndicator.icon then
+						icon = extraIndicator.icon
+					end
+					if extraIndicator.bigIcon == true then
+						isBig = true
+					end
 				end
 
 				-- Ludo / default
@@ -350,7 +349,7 @@ function mod:onRender()
 				scale = math.min(1, scale)
 
 
-				mod:renderIndicator(pos, icon, scale, rotation, newAnm2, newAnimation)
+				mod:renderIndicator(pos, icon, scale, rotation, isBig)
 			end
 		end
 	end
