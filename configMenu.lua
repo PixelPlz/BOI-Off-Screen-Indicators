@@ -40,22 +40,8 @@ if ModConfigMenu then
 	local path = "gfx/ui/offscreen_icons/"
 	
 	local function getRenderPos(x, y)
-		local scale = Options.MaxScale
-		local scaleHelper = 0
-		local yExtra = 0
-
-		if scale == 3 then
-			scaleHelper = 45
-		elseif scale == 2 then
-			scaleHelper = 135
-		elseif scale == 1 then
-			scaleHelper = 400
-			yExtra = 5
-		end
-
-		local x = ScreenHelper.GetScreenTopLeft(x).X + (scaleHelper * 1.8)
-		local y = ScreenHelper.GetScreenTopLeft(y).Y + (scaleHelper + yExtra)
-		return Vector(x, y)
+		local pos = ScreenHelper.GetScreenCenter() + Vector(68, -18) -- copied from mcm, center of right panel
+		return pos + Vector(x, y)
 	end
 
 
@@ -141,7 +127,7 @@ if ModConfigMenu then
 			if HPBars and OIconfig.bossBarsCompat == true then
 				icon = "gfx/ui/bosshp_icons/chapter1/monstro.png"
 			end
-			mod:renderIndicator(getRenderPos(152.5, 154), icon)
+			mod:renderIndicator(getRenderPos(0, 68), icon)
 
 			return "Enhanced boss bars compatibility: " .. (OIconfig.bossBarsCompat and "On" or "Off")
 		end,
@@ -159,7 +145,7 @@ if ModConfigMenu then
 			return OIconfig.ludoIndicators
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(100, 64), path .. "default.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, -40), path .. "default.png", 0.9)
 			return "Ludovico Technique: " .. (OIconfig.ludoIndicators and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -173,7 +159,7 @@ if ModConfigMenu then
 			return OIextraIndicators.goldenCoin.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(100, 75), path .. "coin.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, -28), path .. "coin.png", 0.9)
 			return "Golden Penny: " .. (OIextraIndicators.goldenCoin.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -187,7 +173,7 @@ if ModConfigMenu then
 			return OIextraIndicators.deathsList.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(100, 86), path .. "skull.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, -14), path .. "skull.png", 0.9)
 			return "Death's List: " .. (OIextraIndicators.deathsList.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -201,7 +187,7 @@ if ModConfigMenu then
 			return OIextraIndicators.purgatory.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(100, 98.5), path .. "purgatory.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, 0), path .. "purgatory.png", 0.9)
 			return "Purgatory: " .. (OIextraIndicators.purgatory.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -218,7 +204,7 @@ if ModConfigMenu then
 			return OIextraIndicators.roboBaby2.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(100, 131), path .. "robobaby2.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, 40), path .. "robobaby2.png", 0.9)
 			return "Robo-Baby 2.0: " .. (OIextraIndicators.roboBaby2.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -232,7 +218,7 @@ if ModConfigMenu then
 			return OIextraIndicators.bbFly.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(100, 144), path .. "bbfly.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, 56), path .. "bbfly.png", 0.9)
 			return "Blue Baby's Only Friend: " .. (OIextraIndicators.bbFly.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -246,7 +232,7 @@ if ModConfigMenu then
 			return OIextraIndicators.lilDumpy.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(100, 156), path .. "dumpy.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, 70), path .. "dumpy.png", 0.9)
 			return "Lil Dumpy: " .. (OIextraIndicators.lilDumpy.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -260,7 +246,7 @@ if ModConfigMenu then
 			return OIextraIndicators.stitches.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(100, 168), path .. "stitches.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, 84), path .. "stitches.png", 0.9)
 			return "Stitches: " .. (OIextraIndicators.stitches.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
