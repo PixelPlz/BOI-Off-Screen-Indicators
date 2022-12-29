@@ -174,6 +174,13 @@ function mod:renderIndicator(position, icon, scale, rotation, isBig)
 	-- Icon spritesheet
 	if icon then
 		sprite:ReplaceSpritesheet(0, icon)
+		-- Outline
+		if OIconfig.outline then
+			sprite:ReplaceSpritesheet(1, icon)
+		else
+			sprite:ReplaceSpritesheet(1, "")
+		end
+
 		sprite:LoadGraphics()
 	end
 

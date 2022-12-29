@@ -3,6 +3,7 @@ local json = require("json")
 
 OIconfig = {
 	alwaysShow = true,
+	outline = true,
 
 	marginX = 48,
 	marginY = 24,
@@ -36,11 +37,11 @@ mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, mod.preGameExit)
 
 -- Menu options
 if ModConfigMenu then
-	local pos = Vector(Isaac.GetScreenWidth() - OIconfig.marginX, 0 + OIconfig.marginY)
 	local path = "gfx/ui/offscreen_icons/"
-	
+
+	-- Icon positioning fix by Laceous
 	local function getRenderPos(x, y)
-		local pos = ScreenHelper.GetScreenCenter() + Vector(68, -18) -- copied from mcm, center of right panel
+		local pos = ScreenHelper.GetScreenCenter() + Vector(68, -18) -- Copied from mcm, center of right panel
 		return pos + Vector(x, y)
 	end
 
@@ -67,6 +68,19 @@ if ModConfigMenu then
 	    	OIconfig.alwaysShow = bool
 	    end,
 		Info = {"If disabled, indicators will only show when the map button is held down."}
+  	})
+	-- Outline
+	ModConfigMenu.AddSetting(category, "General", {
+    	Type = ModConfigMenu.OptionType.BOOLEAN,
+	    CurrentSetting = function()
+			return OIconfig.outline
+		end,
+	    Display = function()
+			return "Outline: " .. (OIconfig.outline and "On" or "Off")
+		end,
+	    OnChange = function(bool)
+	    	OIconfig.outline = bool
+	    end,
   	})
 	
 	ModConfigMenu.AddSpace(category, "General")
@@ -127,7 +141,7 @@ if ModConfigMenu then
 			if HPBars and OIconfig.bossBarsCompat == true then
 				icon = "gfx/ui/bosshp_icons/chapter1/monstro.png"
 			end
-			mod:renderIndicator(getRenderPos(0, 68), icon)
+			mod:renderIndicator(getRenderPos(0, 78), icon)
 
 			return "Enhanced boss bars compatibility: " .. (OIconfig.bossBarsCompat and "On" or "Off")
 		end,
@@ -159,7 +173,7 @@ if ModConfigMenu then
 			return OIextraIndicators.goldenCoin.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(-108, -28), path .. "coin.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, -27), path .. "coin.png", 0.9)
 			return "Golden Penny: " .. (OIextraIndicators.goldenCoin.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -187,7 +201,7 @@ if ModConfigMenu then
 			return OIextraIndicators.purgatory.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(-108, 0), path .. "purgatory.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, 1), path .. "purgatory.png", 0.9)
 			return "Purgatory: " .. (OIextraIndicators.purgatory.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -232,7 +246,7 @@ if ModConfigMenu then
 			return OIextraIndicators.lilDumpy.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(-108, 70), path .. "dumpy.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, 71), path .. "dumpy.png", 0.9)
 			return "Lil Dumpy: " .. (OIextraIndicators.lilDumpy.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
@@ -246,7 +260,7 @@ if ModConfigMenu then
 			return OIextraIndicators.stitches.enabled
 		end,
 	    Display = function()
-			mod:renderIndicator(getRenderPos(-108, 84), path .. "stitches.png", 0.9)
+			mod:renderIndicator(getRenderPos(-108, 85), path .. "stitches.png", 0.9)
 			return "Stitches: " .. (OIextraIndicators.stitches.enabled and "On" or "Off")
 		end,
 	    OnChange = function(bool)
