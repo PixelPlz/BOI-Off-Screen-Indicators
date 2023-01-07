@@ -8,6 +8,7 @@ OIconfig = {
 	marginX = 48,
 	marginY = 24,
 
+	enemyIndicators = 1,
 	bossIndicators = true,
 	bossBarsCompat = true,
 
@@ -67,7 +68,7 @@ if ModConfigMenu then
 	    OnChange = function(bool)
 	    	OIconfig.alwaysShow = bool
 	    end,
-		Info = {"If disabled, indicators will only show when the map button is held down."}
+		Info = {"If disabled, indicators will only show when the map button is held down."},
   	})
 	-- Outline
 	ModConfigMenu.AddSetting(category, "General", {
@@ -82,9 +83,6 @@ if ModConfigMenu then
 	    	OIconfig.outline = bool
 	    end,
   	})
-	
-	ModConfigMenu.AddSpace(category, "General")
-
 	-- Margin
 	ModConfigMenu.AddSetting(category, "General", {
     	Type = ModConfigMenu.OptionType.NUMBER,
@@ -117,6 +115,30 @@ if ModConfigMenu then
 
 	ModConfigMenu.AddSpace(category, "General")
 
+	-- Enemies
+	local enemyModes = {
+		{mode = "Never", 				 info = ""},
+		{mode = "Outside of combat", 	 info = "Indicators will show after 8 seconds without dealing damage to enemies."},
+		{mode = "While map is expanded", info = "Indicators will show while the map button is held down."},
+		{mode = "Always", 				 info = ""}
+	}
+	ModConfigMenu.AddSetting(category, "General", {
+    	Type = ModConfigMenu.OptionType.NUMBER,
+	    CurrentSetting = function()
+			return (OIconfig.enemyIndicators)
+		end,
+		Minimum = 0,
+		Maximum = 3,
+	    Display = function()
+			return "Enemy indicators: " .. enemyModes[OIconfig.enemyIndicators + 1].mode
+		end,
+	    OnChange = function(currentNum)
+	    	OIconfig.enemyIndicators = currentNum
+	    end,
+		Info = function()
+			return enemyModes[OIconfig.enemyIndicators + 1].info
+		end,
+  	})
 	-- Bosses
 	ModConfigMenu.AddSetting(category, "General", {
     	Type = ModConfigMenu.OptionType.BOOLEAN,

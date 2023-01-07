@@ -4,6 +4,14 @@ local game = Game()
 local path = "gfx/ui/offscreen_icons/"
 
 OIholdTabCounter = 0
+OIoutsideCombatTimer = 0
+
+OIshowEnemyMode = {
+	Never = 0,
+	AfterTime = 1,
+	WithTab = 2,
+	Always = 3
+}
 
 
 
@@ -46,6 +54,7 @@ OffscreenIndicators:addExtraIndicator(name, type, variant, subtype, *icon, *bigI
 --]]--------------------------------------------------------
 
 OIblacklist = {
+	-- Vanilla bosses
 	{EntityType.ENTITY_LARRYJR, -1, -1, "segmented"},
 	{EntityType.ENTITY_CHUB, -1, -1, "segmented"},
 	{EntityType.ENTITY_PIN, -1, -1, "segmented"},
@@ -174,13 +183,13 @@ function mod:renderIndicator(position, icon, scale, rotation, isBig)
 	-- Icon spritesheet
 	if icon then
 		sprite:ReplaceSpritesheet(0, icon)
+
 		-- Outline
 		if OIconfig.outline then
-			sprite:ReplaceSpritesheet(1, icon)
-		else
-			sprite:ReplaceSpritesheet(1, "")
+			for i = 1, 4 do
+				sprite:ReplaceSpritesheet(i, icon)
+			end
 		end
-
 		sprite:LoadGraphics()
 	end
 
@@ -205,6 +214,14 @@ function mod:isMapButtonHeld()
 	return false
 end
 
+-- Are players out of combat
+function mod:arePlayersOutOfCombat()
+	if Isaac.CountEnemies() > 0 and game:GetRoom():GetEnemyDamageInflicted() <= 0 then
+		return true
+	end
+	return false
+end
+
 -- Check if indicators should be enabled or not
 function mod:areIndicatorsEnabled()
 	if game:IsPaused() == false
@@ -222,6 +239,21 @@ function mod:isValidBoss(entity)
 	and entity.Visible == true
 	and entity.HitPoints >= 0.1
 	and mod:onBlacklist(entity) == false
+	and entity:HasEntityFlags(EntityFlag.FLAG_FRIENDLY) == false then
+		return true
+	end
+	return false
+end
+
+-- Check if entity is a valid enemy
+function mod:isValidEnemy(entity)
+	if ((OIconfig.enemyIndicators == OIshowEnemyMode.AfterTime and OIoutsideCombatTimer >= (30 * 8))
+	or (OIconfig.enemyIndicators == OIshowEnemyMode.WithTab and OIholdTabCounter >= 15)
+	or OIconfig.enemyIndicators == OIshowEnemyMode.Always)
+	and entity:ToNPC() and entity:ToNPC():IsActiveEnemy(false)
+	and entity.Visible == true
+	and entity.HitPoints >= 0.1
+	and entity.EntityCollisionClass ~= EntityCollisionClass.ENTCOLL_NONE and entity:IsInvincible() == false
 	and entity:HasEntityFlags(EntityFlag.FLAG_FRIENDLY) == false then
 		return true
 	end
@@ -271,8 +303,8 @@ end
 --]]--------------------------------------------------------
 
 function mod:onRender()
-	-- If "always show" is disabled then check for the map mode
-	if OIconfig.alwaysShow == false then
+	-- If "always show" is disabled or enemy indicators are set to "with tab" then check for the map mode
+	if OIconfig.alwaysShow == false or OIconfig.enemyIndicators == OIshowEnemyMode.WithTab then
 		-- If EID is enabled then just copy the value from its tab variable
 		if EID then
 			OIholdTabCounter = EID.holdTabCounter
@@ -285,6 +317,15 @@ function mod:onRender()
 		end
 	end
 
+	-- Check if players are outside of combat for enemy indicators
+	if OIconfig.enemyIndicators == OIshowEnemyMode.AfterTime then
+		if mod:arePlayersOutOfCombat() == true then
+			OIoutsideCombatTimer = OIoutsideCombatTimer + 1
+		else
+			OIoutsideCombatTimer = 0
+		end
+	end
+
 
 	for _, entity in ipairs(Isaac.GetRoomEntities()) do
 		local pos = Isaac.WorldToScreen(entity.Position + entity.PositionOffset)
@@ -293,7 +334,7 @@ function mod:onRender()
 		if (pos.X > Isaac.GetScreenWidth() or pos.X < 0 or pos.Y > Isaac.GetScreenHeight() or pos.Y < 0) and game:GetRoom():GetBackdropType() ~= BackdropType.DUNGEON_BEAST then
 			local extraIndicator = mod:hasIndicator(entity)
 
-			if mod:areIndicatorsEnabled() == true and (mod:isValidBoss(entity) == true or mod:isLudoWeapon(entity) == true or extraIndicator ~= false) then
+			if mod:areIndicatorsEnabled() == true and (mod:isValidBoss(entity) == true or mod:isValidEnemy(entity) == true or mod:isLudoWeapon(entity) == true or extraIndicator ~= false) then
 				-- Margins
 				pos = Vector(math.min(Isaac.GetScreenWidth() - OIconfig.marginX, pos.X), math.min(Isaac.GetScreenHeight() - OIconfig.marginY, pos.Y))
 				pos = Vector(math.max(OIconfig.marginX, pos.X), math.max(OIconfig.marginY, pos.Y))
@@ -342,16 +383,20 @@ function mod:onRender()
 					if extraIndicator.bigIcon == true then
 						isBig = true
 					end
+
+				-- Enemy indicators
+				elseif entity:ToNPC() and entity:ToNPC():IsActiveEnemy(false) then
+					icon = path .. "enemy.png"
 				end
 
 				-- Ludo / default
-				if icon == path .. "default.png" then
+				if icon == path .. "default.png" or icon == path .. "enemy.png" then
 					rotation = (Isaac.WorldToScreen(entity.Position + entity.PositionOffset) - pos):GetAngleDegrees()
 				end
 
 
 				-- Scale
-				local scale = 1 - (Isaac.WorldToScreen(entity.Position + entity.PositionOffset):Distance(pos) * 0.001)
+				local scale = 1 - (Isaac.WorldToScreen(entity.Position + entity.PositionOffset):Distance(pos) * 0.0015)
 				scale = math.max(0.5, scale)
 				scale = math.min(1, scale)
 
