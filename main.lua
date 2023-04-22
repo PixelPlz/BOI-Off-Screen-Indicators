@@ -101,11 +101,8 @@ function mod:onBlacklist(entity)
 								return true
 							end
 						end
-
-					else
-						if entity:ToNPC().State == entry[5] then
-							return true
-						end
+					elseif entity:ToNPC().State == entry[5] then
+						return true
 					end
 				end
 				return false
@@ -253,6 +250,7 @@ function mod:isValidEnemy(entity)
 	and entity:ToNPC() and entity:ToNPC():IsActiveEnemy(false)
 	and entity.Visible == true
 	and entity.HitPoints >= 0.1
+	and mod:onBlacklist(entity) == false
 	and entity.EntityCollisionClass ~= EntityCollisionClass.ENTCOLL_NONE and entity:IsInvincible() == false
 	and entity:HasEntityFlags(EntityFlag.FLAG_FRIENDLY) == false then
 		return true
@@ -399,6 +397,17 @@ function mod:onRender()
 				local scale = 1 - (Isaac.WorldToScreen(entity.Position + entity.PositionOffset):Distance(pos) * 0.0015)
 				scale = math.max(0.5, scale)
 				scale = math.min(1, scale)
+
+
+				-- Mirror world fix
+				if Game():GetRoom():IsMirrorWorld() == true then
+					pos = Vector(Isaac.GetScreenWidth() - pos.X, pos.Y)
+
+					if icon == path .. "default.png" or icon == path .. "enemy.png" then
+						local realPos = Isaac.WorldToScreen(entity.Position + entity.PositionOffset)
+						rotation = (Vector(Isaac.GetScreenWidth() - realPos.X, realPos.Y) - pos):GetAngleDegrees()
+					end
+				end
 
 
 				mod:renderIndicator(pos, icon, scale, rotation, isBig)
