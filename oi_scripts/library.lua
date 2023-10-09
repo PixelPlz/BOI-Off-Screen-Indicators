@@ -181,6 +181,15 @@ function mod:AddBlacklist(addType, addVariant, addSubType, addCondition)
 	table.insert(mod.Blacklist, {type = addType, variant = addVariant, subtype = addSubType, condition = addCondition})
 end
 
+-- Old method for adding blacklist entries
+function mod:addOIblacklist(addType, addVariant, addSubType, addCondition, states)
+	local condition = addCondition
+	if addCondition == "state" then
+		condition = states
+	end
+	mod:AddBlacklist(addType, addVariant, addSubType, condition)
+end
+
 
 
 --[[ Extra indicator functions ]]--
@@ -205,4 +214,9 @@ function mod:AddExtraIndicator(addType, addVariant, addSubType, addIcon, isBigIc
 	else
 		table.insert(mod.ExtraIndicators, data)
 	end
+end
+
+-- Old method of adding extra indicators
+function mod:addExtraIndicator(name, addType, addVariant, addSubType, addIcon, isBigIcon, isDirectional)
+	mod:AddExtraIndicator(addType, addVariant, addSubType, addIcon, isBigIcon, isDirectional, name)
 end
