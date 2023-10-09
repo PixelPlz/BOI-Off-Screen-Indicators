@@ -4,12 +4,13 @@
     <directory>off-screen indicators</directory>
     <id>2907117024</id>
     <description></description>
-    <version>1.5</version>
+    <version>1.6</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Items"/>
     <tag id="Familiars"/>
     <tag id="Rooms"/>
+    <tag id="Enemies"/>
     <tag id="Bosses"/>
     <tag id="Tweaks"/>
 </metadata>
