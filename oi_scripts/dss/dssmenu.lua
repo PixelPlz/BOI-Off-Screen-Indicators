@@ -7,7 +7,7 @@ mod.Config = {}
 
 
 -- Default DSS Data
-local defaultConfig = {
+mod.DefaultConfig = {
 	Outline   = true,
 	AlwaysShow = true,
 
@@ -29,7 +29,7 @@ function DSSMenu:LoadSaveData()
 		mod.Config = json.decode(mod:LoadData())
 	end
 
-	for k, v in pairs(defaultConfig) do
+	for k, v in pairs(mod.DefaultConfig) do
 		if mod.Config[k] == nil then
 			mod.Config[k] = v
 		end
@@ -184,7 +184,7 @@ function mod:CreateDSSChoices(settingName, displayName, displayTooltip, choices)
 		variable = settingName,
 
 		load = function()
-			return mod.Config[settingName] or defaultConfig[settingName]
+			return mod.Config[settingName] or mod.DefaultConfig[settingName]
 		end,
 
 		store = function(var)

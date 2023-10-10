@@ -185,7 +185,11 @@ end
 function mod:addOIblacklist(addType, addVariant, addSubType, addCondition, states)
 	local condition = addCondition
 	if addCondition == "state" then
-		condition = states
+		if type(condition) == "number" then
+			condition = {states}
+		else
+			condition = states
+		end
 	end
 	mod:AddBlacklist(addType, addVariant, addSubType, condition)
 end
